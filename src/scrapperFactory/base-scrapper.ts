@@ -1,4 +1,6 @@
-abstract class BaseScraper implements StoreScraper {
+import { StoreScraper } from './store-scrapper.interface';
+
+export abstract class BaseScraper implements StoreScraper {
   abstract scrapeProducts(query: string, page: number): Promise<any>;
 
   sanitizeProducts(products: any) {

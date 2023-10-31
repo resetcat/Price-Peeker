@@ -1,7 +1,8 @@
 import { Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
+import { BaseScraper } from 'src/scrapperFactory/base-scrapper';
 
-class Maxima extends BaseScraper {
+export class Maxima extends BaseScraper {
   private readonly logger = new Logger();
 
   async scrapeProducts(query: string, page: number): Promise<any> {
