@@ -12,7 +12,7 @@ export class AppController {
   }
 
   @Post('grocery')
-  getAll(@Body() searchDto: SearchDto) {
-    return 'test';
+  getAll(@Body() data: SearchDto) {
+    return this.appService.getGrocery(data);
   }
 }

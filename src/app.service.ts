@@ -8,7 +8,7 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async getAll(searchDto: SearchDto) {
+  async getGrocery(searchDto: SearchDto) {
     const { shops = ['R-Gshop', 'M-Gshop'], query, page = 1 } = searchDto;
 
     const results = await Promise.all(
