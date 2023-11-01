@@ -4,7 +4,7 @@ import { RawProductDto } from 'src/dto/products.dto';
 import { BaseScraper } from 'src/scrapperFactory/base-scrapper';
 
 export class Rimi extends BaseScraper {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger('Rimi');
 
   async scrapeProducts(query: string, page: number): Promise<RawProductDto[]> {
     const browser = await puppeteer.launch({

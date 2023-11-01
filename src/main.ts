@@ -7,4 +7,4 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3080);
 }
-bootstrap();
+bootstrap().catch((err) => console.log(err));
