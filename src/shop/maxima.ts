@@ -1,11 +1,12 @@
 import { Logger } from '@nestjs/common';
 import puppeteer from 'puppeteer';
+import { RawProductDto } from 'src/dto/products.dto';
 import { BaseScraper } from 'src/scrapperFactory/base-scrapper';
 
 export class Maxima extends BaseScraper {
   private readonly logger = new Logger();
 
-  async scrapeProducts(query: string, page: number): Promise<any> {
+  async scrapeProducts(query: string, page: number): Promise<RawProductDto[]> {
     const browser = await puppeteer.launch({
       headless: 'new',
     });
@@ -16,8 +17,8 @@ export class Maxima extends BaseScraper {
 
     const products = await webPage.$$eval(
       '.tw-flex-shrink-0.tw-list-none.tw-w-full',
-      (items) => {
-        return items.map((item) => {
+      (items): RawProductDto[] => {
+        return items.map((item): RawProductDto => {
           const name =
             (
               item.querySelector(
@@ -73,6 +74,8 @@ export class Maxima extends BaseScraper {
     );
 
     await browser.close();
+    console.log(products);
+
     this.sanitizeProducts(products);
     return products;
   }

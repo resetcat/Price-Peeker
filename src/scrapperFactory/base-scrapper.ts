@@ -1,9 +1,13 @@
+import { ProductDto, RawProductDto } from 'src/dto/products.dto';
 import { StoreScraper } from './store-scrapper.interface';
 
 export abstract class BaseScraper implements StoreScraper {
-  abstract scrapeProducts(query: string, page: number): Promise<any>;
+  abstract scrapeProducts(
+    query: string,
+    page: number,
+  ): Promise<RawProductDto[]>;
 
-  sanitizeProducts(products: any) {
+  sanitizeProducts(products: RawProductDto[]): void {
     products.forEach((product: any) => {
       if (!product.originalPrice && product.discountedPrice) {
         product.originalPrice = this.formatPrice(product.discountedPrice);
@@ -19,7 +23,7 @@ export abstract class BaseScraper implements StoreScraper {
     return Number(numberPrice.toFixed(2));
   }
 
-  addDiscount(product: any) {
+  addDiscount(product: any): void {
     product.originalPrice = this.formatPrice(product.originalPrice);
 
     if (product.discountedPrice) {

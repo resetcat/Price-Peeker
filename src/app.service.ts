@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { SearchDto } from './dto/search.dto';
 import { StoreScraperFactory } from './scrapperFactory/scrapper-factory';
+import { ProductDto } from './dto/products.dto';
 
 @Injectable()
 export class AppService {
@@ -11,7 +12,7 @@ export class AppService {
   async getGrocery(searchDto: SearchDto) {
     const { shops = ['R-Gshop', 'M-Gshop'], query, page = 1 } = searchDto;
 
-    const results = await Promise.all(
+    const results: ProductDto[] = await Promise.all(
       shops.map((shop) => {
         const scraper = StoreScraperFactory.createScraper(shop);
         return scraper.scrapeProducts(query, page);
