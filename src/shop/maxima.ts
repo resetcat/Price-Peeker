@@ -28,14 +28,11 @@ export class Maxima extends BaseScraper {
 
           const imgElement = item.querySelector('img') as HTMLImageElement;
           const imgURL = imgElement?.src || '';
+          const originalPriceElement = item.querySelector(
+            '.tw-pl-2.tw-text-b-paragraph-xs.tw-font-bold.tw-text-gray-400.lg\\:tw-text-b-paragraph-sm',
+          );
           const originalPrice =
-            (
-              item.querySelector(
-                '.tw-pl-2.tw-text-b-paragraph-xs.tw-font-bold.tw-text-gray-400.lg\\:tw-text-b-paragraph-sm',
-              ) as HTMLElement
-            )?.textContent
-              ?.trim()
-              .replace(',', '.') || '';
+            originalPriceElement?.textContent?.trim().replace(',', '.') || '';
 
           const discountPricePart1 =
             (
@@ -54,9 +51,11 @@ export class Maxima extends BaseScraper {
           const discountedPrice =
             discountPricePart1 + '.' + discountPricePart2 + '€';
 
-          const pricePerUnit = item
-            .querySelector('.tw-flex.tw-flex-row.tw-justify-between > span')
-            .textContent.replace(',', '.');
+          const pricePerUnitElement = item.querySelector(
+            '.tw-flex.tw-flex-row.tw-justify-between > span',
+          );
+          const pricePerUnit =
+            pricePerUnitElement?.textContent?.replace(',', '.') || '';
           const cardOwnerOnly = !!item.querySelector(
             'span.tw-mr-1.tw-text-b-price-3xs.tw-font-semibold',
           );
@@ -74,8 +73,6 @@ export class Maxima extends BaseScraper {
     );
 
     await browser.close();
-    console.log(products);
-
     this.sanitizeProducts(products);
     return products;
   }
