@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SearchDto } from './dto/search.dto';
 import { StoreScraperFactory } from './scrapperFactory/scrapper-factory';
 import { ProductDto } from './dto/products.dto';
 
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger('AppService');
   getHello(): string {
     return 'Hello World!';
   }
