@@ -10,17 +10,32 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async getGrocery(searchDto: SearchDto) {
+  async getGrocery(searchDto: SearchDto): Promise<ProductDto[]> {
     const { shops = ['R-Gshop', 'M-Gshop'], query, page = 1 } = searchDto;
-
-    const results: ProductDto[] = await Promise.all(
-      shops.map((shop) => {
+    const results = await Promise.allSettled(
+      shops.map(async (shop: string) => {
         const scraper = StoreScraperFactory.createScraper(shop);
-        return scraper.scrapeProducts(query, page);
+        try {
+          return await scraper.scrapeProducts(query, page);
+        } catch (error) {
+          this.logger.error(
+            `Error scraping data from ${shop}: ${error.message}`,
+          );
+          return undefined;
+        }
       }),
     );
 
-    // Flatten the results array and sort
-    return results.flat().sort((a, b) => a.originalPrice - b.originalPrice);
+    const successfulResults = results
+      .filter(
+        (result): result is PromiseFulfilledResult<ProductDto[]> =>
+          result.status === 'fulfilled',
+      )
+      .map((result) => result.value)
+      .flat()
+      .sort((a, b) => a.originalPrice - b.originalPrice);
+
+    // Return the successful results
+    return successfulResults;
   }
 }
