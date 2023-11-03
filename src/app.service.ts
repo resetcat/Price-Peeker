@@ -13,20 +13,30 @@ export class AppService {
   async getGrocery(searchDto: SearchDto): Promise<ProductDto[]> {
     const { shops = ['R-Gshop', 'M-Gshop'], query, page = 1 } = searchDto;
     const results = await Promise.allSettled(
-      shops.map(async (shop: string) => {
-        const scraper = StoreScraperFactory.createScraper(shop);
-        try {
-          return await scraper.scrapeProducts(query, page);
-        } catch (error) {
-          this.logger.error(
-            `Error scraping data from ${shop}: ${error.message}`,
-          );
-          return undefined;
-        }
-      }),
+      shops.map((shop) => this.scrapeShop(shop, query, page)),
     );
 
-    const successfulResults = results
+    return this.processResults(results);
+  }
+
+  private async scrapeShop(
+    shop: string,
+    query: string,
+    page: number,
+  ): Promise<ProductDto[] | undefined> {
+    const scraper = StoreScraperFactory.createScraper(shop);
+    try {
+      return await scraper.scrapeProducts(query, page);
+    } catch (error) {
+      this.logger.error(`Error scraping data from ${shop}: ${error.message}`);
+      return undefined;
+    }
+  }
+
+  private processResults(
+    results: PromiseSettledResult<ProductDto[]>[],
+  ): ProductDto[] {
+    return results
       .filter(
         (result): result is PromiseFulfilledResult<ProductDto[]> =>
           result.status === 'fulfilled',
@@ -34,8 +44,5 @@ export class AppService {
       .map((result) => result.value)
       .flat()
       .sort((a, b) => a.originalPrice - b.originalPrice);
-
-    // Return the successful results
-    return successfulResults;
   }
 }
