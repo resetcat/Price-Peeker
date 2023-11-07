@@ -16,7 +16,7 @@ export class AppService {
       shops.map((shop) => this.scrapeShop(shop, query, page)),
     );
 
-    return this.processResults(results);
+    return this.processResults(results, shops.length);
   }
 
   private async scrapeShop(
@@ -33,16 +33,16 @@ export class AppService {
     }
   }
 
-  private processResults(
+  processResults(
     results: PromiseSettledResult<ProductDto[]>[],
+    shopCount: number,
   ): ProductDto[] {
     return results
       .filter(
         (result): result is PromiseFulfilledResult<ProductDto[]> =>
           result.status === 'fulfilled',
       )
-      .map((result) => result.value)
-      .flat()
+      .flatMap((result) => result.value)
       .sort((a, b) => a.originalPrice - b.originalPrice);
   }
 }
