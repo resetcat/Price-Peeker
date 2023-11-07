@@ -16,7 +16,7 @@ export class AppService {
       shops.map((shop) => this.scrapeShop(shop, query, page)),
     );
 
-    return this.processResults(results, shops.length);
+    return this.processResults(results);
   }
 
   private async scrapeShop(
@@ -33,16 +33,46 @@ export class AppService {
     }
   }
 
-  processResults(
+  processResults(results: PromiseSettledResult<ProductDto[]>[]): ProductDto[] {
+    const allProducts = this.getFulfilledProductDtos(results);
+    const productsByShopId = this.groupProductsByShopId(allProducts);
+    const sortedProducts = this.interleaveProducts(productsByShopId);
+    return sortedProducts;
+  }
+
+  private getFulfilledProductDtos(
     results: PromiseSettledResult<ProductDto[]>[],
-    shopCount: number,
   ): ProductDto[] {
     return results
       .filter(
         (result): result is PromiseFulfilledResult<ProductDto[]> =>
           result.status === 'fulfilled',
       )
-      .flatMap((result) => result.value)
-      .sort((a, b) => a.originalPrice - b.originalPrice);
+      .flatMap((result) => result.value);
+  }
+
+  private groupProductsByShopId(products: ProductDto[]): ProductDto[][] {
+    const productsByShopId: ProductDto[][] = [];
+    products.forEach((product) => {
+      const shopIndex = product.id - 1; // id is 1-indexed.
+      productsByShopId[shopIndex] = productsByShopId[shopIndex] || [];
+      productsByShopId[shopIndex].push(product);
+    });
+    return productsByShopId;
+  }
+
+  private interleaveProducts(groups: ProductDto[][]): ProductDto[] {
+    const interleavedProducts: ProductDto[] = [];
+    const maxProducts = Math.max(...groups.map((products) => products.length));
+
+    for (let i = 0; i < maxProducts; i++) {
+      groups.forEach((group) => {
+        if (group && i < group.length) {
+          interleavedProducts.push(group[i]);
+        }
+      });
+    }
+
+    return interleavedProducts;
   }
 }
