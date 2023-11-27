@@ -11,6 +11,7 @@ export class Rimi extends BaseScraper {
     try {
       const browser = await puppeteer.launch({
         headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Recommended args for running in Docker
       });
       const webPage = await browser.newPage();
       const url = `https://www.rimi.lv/e-veikals/lv/meklesana?page=${page}&pageSize=52&query=${query}%3Arelevance%3AassortmentStatus%3AinAssortment`;
