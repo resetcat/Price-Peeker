@@ -11,6 +11,7 @@ export class Maxima extends BaseScraper {
     try {
       const browser = await puppeteer.launch({
         headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Recommended args for running in Docker
       });
       const webPage = await browser.newPage();
       const url = `https://barbora.lv/meklet?q=${query}&page=${page}`;
